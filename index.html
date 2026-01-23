@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Travel Journal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Permanent+Marker&family=Rock+Salt&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'hand': ['"Patrick Hand"', 'cursive'],
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'mono': ['"Courier Prime"', 'monospace'],
+                        'marker': ['"Permanent Marker"', 'cursive'],
+                        'rough': ['"Rock Salt"', 'cursive'],
+                        'messy': ['"Nothing You Could Do"', 'cursive'],
+                    },
+                    colors: {
+                        'paper': '#fdfbf7',
+                        'ink': '#2c3e50',
+                        'accent': '#d4a373',
+                    },
+                    backgroundImage: {
+                        // Updated to a creative doodle/sketch style background
+                        'doodles': "url('https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')",
+                    },
+                    boxShadow: {
+                        'page': 'inset 5px 0 10px rgba(0,0,0,0.05), 1px 1px 5px rgba(0,0,0,0.1)',
+                        'floating': '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            perspective: 2000px;
+            -webkit-perspective: 2000px;
+            overflow: hidden;
+            touch-action: none; 
+            background-color: #1a1a1a;
+        }
+
+        /* The 3D Book Container */
+        .book {
+            position: relative;
+            width: 420px;
+            height: 580px;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin: 0 auto;
+            transform: rotateX(10deg); /* Slight tilt for better 3D feel */
+            -webkit-transform: rotateX(10deg);
+            will-change: transform;
+        }
+
+        /* Mobile & Tablet Responsive sizing */
+        @media (max-width: 850px) {
+            .book { width: 320px; height: 480px; }
+            
+            /* Move tabs to TOP for Tablet */
+            .tabs-container {
+                right: 0 !important;
+                left: 0;
+                top: -28px !important;
+                width: 100%;
+                flex-direction: row !important;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 2px !important;
+                padding: 0 10px;
+            }
+            
+            .tab {
+                width: auto !important;
+                min-width: 25px;
+                height: 28px !important;
+                border-radius: 5px 5px 0 0 !important; /* Rounded top corners */
+                border-left: none !important;
+                border-bottom: 1px solid rgba(0,0,0,0.1);
+                font-size: 0.6rem !important;
+                padding: 0 6px;
+            }
+            
+            .tab:hover {
+                transform: translateY(-5px) !important;
+            }
+        }
+        
+        @media (max-width: 650px) {
+            .book {
+                width: 90vw; /* Use mostly full width on mobile to center the single page */
+                max-width: 400px;
+                height: 65vh;
+                margin-top: 20px; /* More space at top for tabs */
+            }
+            
+            /* Tabs adjustments for Mobile */
+            .tabs-container {
+                transform: none !important; /* Remove any scaling */
+                top: -24px !important;
+                right: 0 !important; /* Override desktop right */
+                gap: 1px !important;
+            }
+            
+            .tab {
+                font-size: 0.5rem !important;
+                height: 24px !important;
+                padding: 0 4px;
+            }
+
+            .sticker.title-sticker {
+                font-size: 2rem !important;
+                padding: 0.5rem !important;
+            }
+            .cover-deco-img {
+                display: none; /* Hide complex images on very small screens if needed */
+            }
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: left center;
+            -webkit-transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1), z-index 0.2s;
+            -webkit-transition: -webkit-transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1), z-index 0.2s;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            background-color: #fdfbf7;
+            box-shadow: inset 4px 0 10px rgba(0,0,0,0.05), 2px 0 5px rgba(0,0,0,0.1);
+            border-radius: 2px 6px 6px 2px;
+            cursor: pointer;
+            -webkit-font-smoothing: antialiased; 
+            /* Fix for Safari flickering */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden; 
+        }
+
+        /* --- Front Cover Design --- */
+        .page.cover-front {
+            background: #8B4513; /* SaddleBrown leather base */
+            border-radius: 4px 8px 8px 4px;
+            z-index: 100;
+            /* Leather Texture Simulation */
+            background-image: url("https://www.transparenttextures.com/patterns/black-scales.png"); 
+            border: 1px solid #5c2e0b;
+        }
+        
+        /* Elastic Band */
+        .elastic-band {
+            position: absolute;
+            right: 20px;
+            top: 0;
+            bottom: 0;
+            width: 15px;
+            background: #1a1a1a;
+            z-index: 50;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.5);
+            opacity: 0.9;
+            transition: transform 0.3s;
+        }
+        .book.open .elastic-band {
+            transform: translateX(30px); /* Move away when opening */
+            opacity: 0;
+        }
+
+        /* Stickers on Cover */
+        .sticker {
+            position: absolute;
+            padding: 0.5rem 1rem;
+            background: white;
+            color: #333;
+            font-family: 'Permanent Marker', cursive;
+            border: 3px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 20;
+            backface-visibility: hidden; /* Hide when cover flipped */
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(1px); /* Lift slightly to avoid z-fighting */
+            -webkit-transform: translateZ(1px);
+        }
+        
+        .sticker.holographic {
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            color: white;
+            border: none;
+            opacity: 0.9;
+        }
+        
+        .sticker.circle {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            aspect-ratio: 1;
+        }
+        
+        .sticker.tape {
+            background: rgba(255, 255, 255, 0.4);
+            border: none;
+            box-shadow: none;
+            height: 40px;
+            width: 120px;
+            backdrop-filter: blur(2px);
+            z-index: 30;
+        }
+
+        /* --- Inner Pages --- */
+        .page-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            overflow: hidden;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            /* Safari z-fighting fix for content */
+            transform: translateZ(0); 
+            -webkit-transform: translateZ(0);
+        }
+        
+        @media (max-width: 650px) {
+            .page-face { padding: 1.25rem; }
+        }
+
+        .page-face.back {
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+            background-color: #fdfbf7;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 1.5rem; /* Lined paper style */
+            border-right: none;
+            border-left: 1px solid #d1d5db;
+            border-radius: 4px 0 0 4px;
+            box-shadow: inset -10px 0 20px rgba(0,0,0,0.05);
+        }
+
+        .page-face.front {
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 1.5rem; /* Lined paper style */
+            box-shadow: inset 10px 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Tabs (Default Desktop) */
+        .tabs-container {
+            position: absolute;
+            right: -45px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+        
+        /* Fix for Tabs hiding when open */
+        .book.open .tabs-container {
+             z-index: -1; 
+             transform: translateZ(-2px); /* Push slightly back */
+             -webkit-transform: translateZ(-2px);
+        }
+        
+        .tab {
+            width: 55px;
+            height: 22px;
+            background-color: #fcd34d;
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.6rem;
+            font-weight: bold;
+            color: #4b5563;
+            cursor: pointer;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            border-left: 1px solid rgba(0,0,0,0.1);
+        }
+        .tab:hover { transform: translateX(5px); }
+
+        /* Polaroid */
+        .polaroid {
+            background: white;
+            padding: 8px 8px 25px 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: rotate(-2deg) translateZ(1px); /* Avoid z-fighting */
+            -webkit-transform: rotate(-2deg) translateZ(1px);
+            transition: transform 0.3s;
+            margin-bottom: 1.5rem;
+        }
+        .polaroid:hover { transform: rotate(0deg) scale(1.02) translateZ(2px); }
+        .polaroid img {
+            width: 100%;
+            height: 180px;
+            object-cover: cover;
+            filter: contrast(1.1) saturate(1.1);
+        }
+        
+        @media (max-width: 650px) {
+            .polaroid img { height: 140px; }
+            .polaroid { margin-bottom: 1rem; }
+        }
+
+        .shadow-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
+            pointer-events: none;
+            z-index: 10;
+            transform: translateZ(1px); /* Lift shadow */
+            -webkit-transform: translateZ(1px);
+        }
+        
+        .page.flipped {
+            transform: rotateY(-180deg);
+            -webkit-transform: rotateY(-180deg);
+        }
+
+        /* 3D Thickness Simulation */
+        .book::before {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            transform: translateZ(-10px);
+            -webkit-transform: translateZ(-10px);
+            border-radius: 2px 6px 6px 2px;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* Spine of the book (visual only when closed/rotated) */
+        .book-spine {
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 40px;
+             height: 100%;
+             background: #5c2e0b; /* Darker Leather */
+             transform: rotateY(90deg) translateX(-20px) translateZ(-20px);
+             -webkit-transform: rotateY(90deg) translateX(-20px) translateZ(-20px);
+             z-index: 0;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 bg-doodles bg-cover bg-center min-h-screen flex items-center justify-center">
+
+    <div class="scene w-full h-full flex items-center justify-center relative perspective-[2000px]">
+        
+        <div class="book" id="book">
+            <div class="book-spine"></div>
+            <div class="tabs-container" id="tabs-container"></div>
+            <!-- Pages injected via JS -->
+        </div>
+        
+    </div>
+
+    <script>
+        // --- DATA ---
+        const blogData = [
+            {
+                id: 1,
+                date: "2023-10-24",
+                title: "The Beginning",
+                summary: "Started working on a new project today.",
+                content: "Today marks the beginning of my digital gardening journey. I've always wanted a place to dump my raw thoughts without the pressure of 'production quality' content. I sat at the cafe on the corner for three hours.",
+                mood: "Excited",
+                image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                weather: "Sunny"
+            },
+            {
+                id: 2,
+                date: "2023-11-02",
+                title: "Rainy Bugs",
+                summary: "Some days are harder than others.",
+                content: "Rain tapped against the window all day. It matched my mood perfectly. Why is CSS grid so intuitive yet z-index so frustrating sometimes? Eventually figured it out. It was a parent container issue.",
+                mood: "Frustrated",
+                image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                weather: "Rainy"
+            },
+            {
+                id: 3,
+                date: "2023-11-15",
+                title: "Nature Walk",
+                summary: "Disconnected from the screens today.",
+                content: "Left the phone at home. Walked through the arboretum. The leaves are turning that brilliant shade of burnt orange. I realized I've been spending too much time optimizing my workflow instead of actually working.",
+                mood: "Calm",
+                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                weather: "Cloudy"
+            },
+            {
+                id: 4,
+                date: "2023-12-01",
+                title: "December Goals",
+                summary: "Reflecting on the year so far.",
+                content: "Can't believe it's December. The year flew by. Goals for this month: Finish the portfolio site, buy gifts early (no Christmas Eve panic), and bake sourdough bread again. Simple things.",
+                mood: "Determined",
+                image: null,
+                weather: "Cold"
+            },
+            {
+                id: 5,
+                date: "2024-01-10",
+                title: "New Year",
+                summary: "Fresh start.",
+                content: "The gym was crowded today. As expected. I'm trying to stick to my routine regardless of the chaos. Coded a small python script to automate my file organization.",
+                mood: "Focused",
+                image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                weather: "Snowy"
+            }
+        ];
+
+        // --- SETUP ---
+        const book = document.getElementById('book');
+        const tabsContainer = document.getElementById('tabs-container');
+        let pages = []; 
+        let currentPageIndex = 0; 
+        
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const tabsData = {}; 
+
+        function init() {
+            createBookStructure();
+            updateZIndexes();
+            lucide.createIcons();
+            centerBook(); // Initial positioning
+            
+            // Logic to auto-open to latest entry
+            // Find the index of the last entry page
+            const lastEntryPageIndex = pages.length - 2; 
+            
+            setTimeout(() => {
+                if(currentPageIndex === 0) {
+                    flipTo(lastEntryPageIndex > 0 ? lastEntryPageIndex : 1);
+                }
+            }, 800);
+            
+            // Re-center on resize
+            window.addEventListener('resize', centerBook);
+        }
+
+        // --- DOM GENERATION ---
+        function createBookStructure() {
+            // 1. COOL COVER
+            const cover = document.createElement('div');
+            cover.className = 'page cover-front';
+            cover.innerHTML = `
+                <div class="elastic-band"></div>
+
+                <!-- Cover Decorations -->
+                <div class="absolute top-20 left-10 w-48 h-56 bg-white p-2 shadow-md rotate-[-5deg] z-20 cover-deco-img">
+                    <img src="https://images.unsplash.com/photo-1500835556837-99ac94a94552?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-40 object-cover border border-gray-200 grayscale-[20%]">
+                    <div class="font-messy text-center text-gray-600 mt-2 text-lg">Wanderlust</div>
+                </div>
+                <div class="sticker tape" style="top: 70px; left: 80px; transform: rotate(-15deg); width: 100px;"></div>
+
+                <!-- Title Sticker -->
+                <div class="sticker title-sticker bg-yellow-400 text-black border-4 border-black rotate-3 shadow-xl" style="bottom: 150px; right: 20px; font-size: 3rem;">
+                    JOURNEY
+                </div>
+
+                <!-- Small stickers -->
+                <div class="sticker circle bg-red-500 text-white w-20 h-20 rotate-12 flex items-center justify-center text-xs font-bold border-2 border-white shadow-lg" style="top: 30px; right: 30px;">
+                    FRAGILE
+                </div>
+                
+                <div class="sticker bg-blue-600 text-white text-xs rotate-[-10deg] border-2 border-white" style="bottom: 80px; left: 40px;">
+                    EST. 2024
+                </div>
+
+                <div class="sticker bg-green-500 text-white text-xs rotate-6 border-2 border-white" style="bottom: 40px; right: 60px;">
+                    WILD & FREE
+                </div>
+                
+                <!-- Inside Cover (Now just pattern) -->
+                <div class="page-face back p-8 flex flex-col items-center justify-center bg-[#2c2c2c] text-gray-600">
+                    <div class="opacity-10">
+                         <i data-lucide="map" class="w-48 h-48"></i>
+                    </div>
+                </div>
+            `;
+            book.appendChild(cover);
+            pages.push(cover);
+
+            // 2. Owner Info Page (Separate Page with Profile Photo)
+            const ownerPage = document.createElement('div');
+            ownerPage.className = 'page';
+            ownerPage.innerHTML = `
+                <div class="page-face front p-6 md:p-8 flex flex-col bg-[#fdfbf7]">
+                    <div class="shadow-spine"></div>
+                    
+                    <!-- Profile Header -->
+                    <div class="flex flex-col items-center mt-2 md:mt-4">
+                        <div class="w-28 h-28 md:w-32 md:h-32 bg-white p-2 shadow-md rotate-2 mb-4">
+                             <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Alex" alt="Owner" class="w-full h-full object-cover border border-gray-200">
+                        </div>
+                        <h2 class="font-marker text-2xl md:text-3xl text-ink">Alex Developer</h2>
+                        <p class="font-hand text-accent text-base md:text-lg">World Explorer & Coder</p>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="mt-6 space-y-3 font-mono text-xs md:text-sm text-gray-600 border-t border-dashed border-gray-300 pt-4">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="mail" class="w-4 h-4 text-accent"></i>
+                            <span>alex@example.com</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="phone" class="w-4 h-4 text-accent"></i>
+                            <span>+1 (555) 019-2834</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-accent"></i>
+                            <span>San Francisco, CA</span>
+                        </div>
+                    </div>
+
+                    <!-- Socials -->
+                    <div class="mt-6">
+                        <p class="font-hand text-gray-400 mb-2 text-center text-sm">Follow the journey:</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition text-ink hover:text-blue-500"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                            <a href="#" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition text-ink hover:text-blue-400"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                            <a href="#" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition text-ink hover:text-black"><i data-lucide="github" class="w-4 h-4"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Decor -->
+                    <div class="mt-auto flex justify-between items-end opacity-40">
+                         <i data-lucide="stamp" class="w-12 h-12 md:w-16 md:h-16 text-red-800 rotate-[-15deg]"></i>
+                         <div class="font-messy text-xs md:text-sm rotate-6 text-gray-500">Est. 2023</div>
+                    </div>
+                </div>
+                
+                <div class="page-face back p-8 flex items-center justify-center bg-[#fdfbf7]">
+                    <div class="shadow-spine" style="left: auto; right: 0; background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);"></div>
+                    <div class="text-center relative w-full h-full flex flex-col items-center justify-center">
+                        <p class="font-hand text-xl text-gray-400 italic mb-4 relative z-10">"Not all those who wander are lost."</p>
+                        <i data-lucide="compass" class="w-24 h-24 text-gray-200 absolute opacity-50"></i>
+                         <div class="mt-4 font-mono text-xs text-gray-400 relative z-10">
+                            J.R.R. Tolkien
+                        </div>
+                    </div>
+                </div>
+            `;
+            book.appendChild(ownerPage);
+            pages.push(ownerPage);
+
+            // 3. Table of Contents
+            const tocPage = document.createElement('div');
+            tocPage.className = 'page';
+            tocPage.innerHTML = `
+                <div class="page-face front p-8">
+                    <div class="shadow-spine"></div>
+                    <h2 class="font-messy text-4xl text-center mb-8 text-ink underline decoration-wavy decoration-accent/50 decoration-2">Table of Contents</h2>
+                    <ul class="space-y-4 font-hand text-xl text-gray-700 overflow-y-auto h-full pb-8 custom-scrollbar">
+                        ${blogData.map((entry, idx) => `
+                            <li class="flex items-center gap-3 cursor-pointer hover:text-accent group" onclick="flipTo(${idx + 3})">
+                                <span class="text-xs font-mono text-gray-400 group-hover:text-accent border border-gray-300 rounded px-1">${new Date(entry.date).toLocaleDateString(undefined, {month:'short', day:'numeric'})}</span>
+                                <span class="truncate border-b border-dotted border-gray-300 flex-1 pb-1">${entry.title}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <!-- Back of TOC (Left Page of Entry 1) -->
+                <div class="page-face back p-8 flex flex-col items-center justify-center bg-[#fdfbf7]">
+                     <div class="shadow-spine" style="left: auto; right: 0; background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);"></div>
+                     <div class="opacity-10 rotate-12">
+                         <i data-lucide="feather" class="w-32 h-32 text-gray-400"></i>
+                     </div>
+                </div>
+            `;
+            book.appendChild(tocPage);
+            pages.push(tocPage);
+
+            // 4. Generate Entries (New Layout: Content & Image on Front/Right)
+            blogData.forEach((entry, index) => {
+                const sheet = document.createElement('div');
+                sheet.className = 'page';
+                
+                // Tabs Logic
+                const date = new Date(entry.date);
+                const monthShort = date.toLocaleString('default', { month: 'short' });
+                if (tabsData[monthShort] === undefined) tabsData[monthShort] = pages.length; 
+                
+                // Front: Image AND Text (Right Page)
+                const frontContent = `
+                    <div class="page-face front p-6 md:p-8 flex flex-col">
+                         <div class="shadow-spine"></div>
+                         
+                         <!-- Header -->
+                         <div class="flex justify-between items-start mb-4 border-b-2 border-accent/20 pb-2">
+                            <div>
+                                <h2 class="font-rough text-lg md:text-xl text-ink leading-tight">${entry.title}</h2>
+                                <div class="font-mono text-[10px] text-gray-400 mt-1">${new Date(entry.date).toLocaleDateString()}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-mono text-[10px] text-gray-400">Pg ${index + 1}</div>
+                                <div class="font-hand text-lg text-accent">${entry.weather}</div>
+                            </div>
+                         </div>
+                         
+                         <!-- Image (Polaroid style inline) -->
+                         ${entry.image ? `
+                         <div class="polaroid bg-white p-2 shadow-sm transform -rotate-1 self-center w-[85%] mx-auto mb-4 shrink-0">
+                            <img src="${entry.image}" class="w-full h-32 md:h-40 object-cover grayscale-[10%]">
+                            <div class="font-messy text-center text-gray-500 mt-1 text-sm">${entry.mood}</div>
+                         </div>` : ''}
+                         
+                         <!-- Body -->
+                         <div class="prose prose-sm font-hand text-lg leading-relaxed text-gray-800 overflow-y-auto pr-2 custom-scrollbar flex-grow">
+                            ${entry.content}
+                         </div>
+                         
+                         <!-- Footer -->
+                         <div class="mt-2 pt-2 flex flex-wrap gap-2 text-[10px] md:text-xs font-mono text-gray-400 border-t border-dashed border-gray-300 shrink-0">
+                             ${entry.tags ? entry.tags.map(t => `<span class="bg-yellow-50 px-2 py-1 rounded text-yellow-700">#${t}</span>`).join('') : ''}
+                         </div>
+                    </div>
+                `;
+
+                // Back: Blank / Decorative Pattern (Left Page of Next Entry)
+                const backContent = `
+                    <div class="page-face back p-0 flex flex-col items-center justify-center bg-[#fdfbf7]">
+                         <div class="shadow-spine" style="left: auto; right: 0; background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);"></div>
+                         <div class="absolute opacity-5 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                             <i data-lucide="feather" class="w-48 h-48 text-ink"></i>
+                         </div>
+                         <div class="absolute bottom-4 left-4 font-mono text-[10px] text-gray-300">
+                             Notes
+                         </div>
+                    </div>
+                `;
+
+                sheet.innerHTML = frontContent + backContent;
+                book.appendChild(sheet);
+                pages.push(sheet);
+            });
+
+            // 5. End Page buffer
+            const comingSoonPage = document.createElement('div');
+            comingSoonPage.className = 'page';
+            comingSoonPage.innerHTML = `
+                <div class="page-face front p-8 flex flex-col items-center justify-center text-center">
+                    <div class="shadow-spine"></div>
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <h2 class="font-marker text-4xl text-gray-300 mb-4 rotate-[-5deg]">Future Plans</h2>
+                        <button onclick="flipTo(0)" class="mt-8 px-6 py-2 bg-ink text-white font-mono text-xs rounded shadow hover:bg-black transition">Close Book</button>
+                    </div>
+                </div>
+                <div class="page-face back p-8 flex items-center justify-center bg-gray-900 text-white">
+                     <span class="font-mono text-xs opacity-50">Designed with Love</span>
+                </div>
+            `;
+            book.appendChild(comingSoonPage);
+            pages.push(comingSoonPage);
+            
+            // Render Tabs
+            renderTabs();
+            
+            // Event Listeners
+            pages.forEach((page, i) => {
+                page.addEventListener('click', (e) => {
+                    // Logic to detect if clicked on the left side of the page
+                    // This is helpful for mobile where the left page might be off-screen
+                    const rect = page.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const isLeftClick = x < rect.width / 3; // Left 33% triggers back on current page
+
+                    if (i < currentPageIndex) {
+                        // Clicked on the left stack (visible on desktop) -> Go to this page (Back)
+                        flipTo(i); 
+                    } else if (i === currentPageIndex) {
+                        // Clicked on the active right page
+                        if (isLeftClick && i > 0) {
+                            // User clicked left edge of right page -> Go Back
+                            flipTo(i - 1);
+                        } else {
+                            // Regular click -> Next
+                            flipTo(i + 1);
+                        }
+                    }
+                });
+            });
+        }
+        
+        function renderTabs() {
+            const comingSoonIndex = pages.length - 1;
+            tabsContainer.innerHTML = monthNames.map((month, i) => {
+                const targetIndex = tabsData[month] !== undefined ? tabsData[month] : comingSoonIndex;
+                const color = ['#fca5a5', '#fdba74', '#fcd34d', '#86efac', '#67e8f9', '#93c5fd', '#c4b5fd', '#f0abfc'][i % 8];
+                return `
+                    <div class="tab" style="background-color: ${color}" onclick="event.stopPropagation(); flipTo(${targetIndex})">
+                        ${month}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function flipTo(index) {
+            if (index < 0) index = 0;
+            if (index >= pages.length) index = pages.length - 1;
+            
+            currentPageIndex = index;
+            
+            pages.forEach((page, i) => {
+                if (i < currentPageIndex) {
+                    page.classList.add('flipped');
+                } else {
+                    page.classList.remove('flipped');
+                }
+            });
+            
+            updateZIndexes();
+            centerBook();
+        }
+
+        function updateZIndexes() {
+            const total = pages.length;
+            pages.forEach((page, i) => {
+                if (page.classList.contains('flipped')) {
+                    // Left stack: Topmost (highest index) should be on top
+                    page.style.zIndex = i + 1; 
+                } else {
+                    // Right stack: Topmost (lowest index) should be on top
+                    page.style.zIndex = total - i;
+                }
+            });
+        }
+        
+        function centerBook() {
+            const isMobile = window.innerWidth <= 650;
+            
+            // When open, shift right to center the spine
+            if (currentPageIndex > 0 && currentPageIndex < pages.length) {
+                book.classList.add('open');
+                
+                if (isMobile) {
+                    // MOBILE: Don't shift. Keep the book block (Right Pages) centered in the viewport.
+                    // The Left Pages (Flipped) will naturally go off to the left side/edge.
+                    book.style.transform = 'rotateX(10deg) translateX(0)';
+                } else {
+                    // DESKTOP: Shift right to center the open spread (Spine in center)
+                    book.style.transform = 'rotateX(10deg) translateX(50%)'; 
+                }
+                
+            } else {
+                book.classList.remove('open');
+                book.style.transform = 'rotateX(10deg) translateX(0)';
+            }
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
