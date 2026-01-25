@@ -41,5 +41,18 @@ const blogData = [
         "mood": "Focused",
         "image": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
         "weather": "Snowy"
+    },
+    {
+        "id": 6,
+        "date": "2026-01-25",
+        "title": "New Adventure",
+        "summary": "Testing",
+        "content": "Hello World Kaise ho",
+        "mood": "Calm",
+        "weather": "Cloudy",
+        "tags": [
+            "Journal"
+        ],
+        "image": ""
     }
 ];
