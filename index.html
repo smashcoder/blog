@@ -16,6 +16,9 @@
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- LOAD BLOG DATA (External File) -->
+    <script src="blogData.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -34,7 +37,6 @@
                         'accent': '#d4a373',
                     },
                     backgroundImage: {
-                        // Updated to a creative doodle/sketch style background
                         'doodles': "url('https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')",
                     },
                     boxShadow: {
@@ -385,59 +387,68 @@
     </div>
 
     <script>
-        // --- DATA ---
-        const blogData = [
-            {
-                id: 1,
-                date: "2023-10-24",
-                title: "The Beginning",
-                summary: "Started working on a new project today.",
-                content: "Today marks the beginning of my digital gardening journey. I've always wanted a place to dump my raw thoughts without the pressure of 'production quality' content. I sat at the cafe on the corner for three hours.",
-                mood: "Excited",
-                image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                weather: "Sunny"
-            },
-            {
-                id: 2,
-                date: "2023-11-02",
-                title: "Rainy Bugs",
-                summary: "Some days are harder than others.",
-                content: "Rain tapped against the window all day. It matched my mood perfectly. Why is CSS grid so intuitive yet z-index so frustrating sometimes? Eventually figured it out. It was a parent container issue.",
-                mood: "Frustrated",
-                image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                weather: "Rainy"
-            },
-            {
-                id: 3,
-                date: "2023-11-15",
-                title: "Nature Walk",
-                summary: "Disconnected from the screens today.",
-                content: "Left the phone at home. Walked through the arboretum. The leaves are turning that brilliant shade of burnt orange. I realized I've been spending too much time optimizing my workflow instead of actually working.",
-                mood: "Calm",
-                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                weather: "Cloudy"
-            },
-            {
-                id: 4,
-                date: "2023-12-01",
-                title: "December Goals",
-                summary: "Reflecting on the year so far.",
-                content: "Can't believe it's December. The year flew by. Goals for this month: Finish the portfolio site, buy gifts early (no Christmas Eve panic), and bake sourdough bread again. Simple things.",
-                mood: "Determined",
-                image: null,
-                weather: "Cold"
-            },
-            {
-                id: 5,
-                date: "2024-01-10",
-                title: "New Year",
-                summary: "Fresh start.",
-                content: "The gym was crowded today. As expected. I'm trying to stick to my routine regardless of the chaos. Coded a small python script to automate my file organization.",
-                mood: "Focused",
-                image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                weather: "Snowy"
-            }
-        ];
+        // --- DATA FALLBACK ---
+        // In case the external file doesn't load in preview
+        let activeBlogData = [];
+
+        if (typeof blogData !== 'undefined') {
+            activeBlogData = blogData;
+        } else {
+            console.warn("blogData.js not loaded. Using fallback data.");
+            // Fallback Data for Preview
+            activeBlogData = [
+                {
+                    id: 1,
+                    date: "2023-10-24",
+                    title: "The Beginning",
+                    summary: "Started working on a new project today.",
+                    content: "Today marks the beginning of my digital gardening journey. I've always wanted a place to dump my raw thoughts without the pressure of 'production quality' content. I sat at the cafe on the corner for three hours.",
+                    mood: "Excited",
+                    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    weather: "Sunny"
+                },
+                {
+                    id: 2,
+                    date: "2023-11-02",
+                    title: "Rainy Bugs",
+                    summary: "Some days are harder than others.",
+                    content: "Rain tapped against the window all day. It matched my mood perfectly. Why is CSS grid so intuitive yet z-index so frustrating sometimes? Eventually figured it out. It was a parent container issue.",
+                    mood: "Frustrated",
+                    image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    weather: "Rainy"
+                },
+                {
+                    id: 3,
+                    date: "2023-11-15",
+                    title: "Nature Walk",
+                    summary: "Disconnected from the screens today.",
+                    content: "Left the phone at home. Walked through the arboretum. The leaves are turning that brilliant shade of burnt orange. I realized I've been spending too much time optimizing my workflow instead of actually working.",
+                    mood: "Calm",
+                    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    weather: "Cloudy"
+                },
+                {
+                    id: 4,
+                    date: "2023-12-01",
+                    title: "December Goals",
+                    summary: "Reflecting on the year so far.",
+                    content: "Can't believe it's December. The year flew by. Goals for this month: Finish the portfolio site, buy gifts early (no Christmas Eve panic), and bake sourdough bread again. Simple things.",
+                    mood: "Determined",
+                    image: null,
+                    weather: "Cold"
+                },
+                {
+                    id: 5,
+                    date: "2024-01-10",
+                    title: "New Year",
+                    summary: "Fresh start.",
+                    content: "The gym was crowded today. As expected. I'm trying to stick to my routine regardless of the chaos. Coded a small python script to automate my file organization.",
+                    mood: "Focused",
+                    image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    weather: "Snowy"
+                }
+            ];
+        }
 
         // --- SETUP ---
         const book = document.getElementById('book');
@@ -582,7 +593,7 @@
                     <div class="shadow-spine"></div>
                     <h2 class="font-messy text-4xl text-center mb-8 text-ink underline decoration-wavy decoration-accent/50 decoration-2">Table of Contents</h2>
                     <ul class="space-y-4 font-hand text-xl text-gray-700 overflow-y-auto h-full pb-8 custom-scrollbar">
-                        ${blogData.map((entry, idx) => `
+                        ${activeBlogData.map((entry, idx) => `
                             <li class="flex items-center gap-3 cursor-pointer hover:text-accent group" onclick="flipTo(${idx + 3})">
                                 <span class="text-xs font-mono text-gray-400 group-hover:text-accent border border-gray-300 rounded px-1">${new Date(entry.date).toLocaleDateString(undefined, {month:'short', day:'numeric'})}</span>
                                 <span class="truncate border-b border-dotted border-gray-300 flex-1 pb-1">${entry.title}</span>
@@ -602,7 +613,7 @@
             pages.push(tocPage);
 
             // 4. Generate Entries (New Layout: Content & Image on Front/Right)
-            blogData.forEach((entry, index) => {
+            activeBlogData.forEach((entry, index) => {
                 const sheet = document.createElement('div');
                 sheet.className = 'page';
                 
