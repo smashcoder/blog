@@ -31,15 +31,5 @@ const blogData = [
         "mood": "Calm",
         "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
         "weather": "Cloudy"
-    },
-    {
-        "id": 5,
-        "date": "2024-01-10",
-        "title": "New Year",
-        "summary": "Fresh start.",
-        "content": "The gym was crowded today. As expected. I'm trying to stick to my routine regardless of the chaos. Coded a small python script to automate my file organization.",
-        "mood": "Focused",
-        "image": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        "weather": "Snowy"
     }
 ];
