@@ -21,15 +21,5 @@ const blogData = [
         "mood": "Frustrated",
         "image": "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
         "weather": "Rainy"
-    },
-    {
-        "id": 3,
-        "date": "2023-11-15",
-        "title": "Nature Walk",
-        "summary": "Disconnected from the screens today.",
-        "content": "Left the phone at home. Walked through the arboretum. The leaves are turning that brilliant shade of burnt orange. I realized I've been spending too much time optimizing my workflow instead of actually working.",
-        "mood": "Calm",
-        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        "weather": "Cloudy"
     }
 ];
